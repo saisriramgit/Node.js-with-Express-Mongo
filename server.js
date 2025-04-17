@@ -55,10 +55,17 @@
 
 const express = require("express");
 const dotenv = require("dotenv");
+const logger = require("./middleware/logger");
+
+const bootcamp = require("./routes/bootcamp");
 
 dotenv.config({ path: "./config/config.env" });
 
 const app = express();
+
+app.use(logger);
+
+app.use("/api/v1/bootcamps", bootcamp);
 
 PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
