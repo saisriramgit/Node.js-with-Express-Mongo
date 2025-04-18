@@ -56,18 +56,30 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const logger = require("./middleware/logger");
-
-const bootcamp = require("./routes/bootcamp");
+const connectDB = require("./config/db");
+const errorHandler = require("./middleware/error");
 
 dotenv.config({ path: "./config/config.env" });
 
+connectDB();
+
+const bootcamp = require("./routes/bootcamp");
+
 const app = express();
 
-app.use(logger);
+app.use(express.json());
 
 app.use("/api/v1/bootcamps", bootcamp);
 
+app.use(errorHandler);
+
 PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+});
+
+process.on("unhandledRejection", (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  server.close(() => process.exit(1));
 });
